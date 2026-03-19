@@ -14,6 +14,8 @@ interface MapState {
   selectedReport: Report | null;
   isLoading: boolean;
   statusFilter: StatusFilter;
+  activeCleanup: Report | null;
+  cleanupStartedAt: number | null;
 
   setGuestId: (id: string) => void;
   setCurrentPosition: (pos: { lat: number; lng: number }) => void;
@@ -24,6 +26,9 @@ interface MapState {
   setSelectedReport: (report: Report | null) => void;
   setIsLoading: (loading: boolean) => void;
   setStatusFilter: (filter: StatusFilter) => void;
+  setActiveCleanup: (report: Report | null) => void;
+  setCleanupStartedAt: (ts: number | null) => void;
+  updateReportStatus: (id: string, status: ReportStatus) => void;
 }
 
 export const useMapStore = create<MapState>((set) => ({
@@ -36,6 +41,8 @@ export const useMapStore = create<MapState>((set) => ({
   selectedReport: null,
   isLoading: true,
   statusFilter: "all",
+  activeCleanup: null,
+  cleanupStartedAt: null,
 
   setGuestId: (id) => set({ guestId: id }),
   setCurrentPosition: (pos) => set({ currentPosition: pos }),
@@ -46,4 +53,10 @@ export const useMapStore = create<MapState>((set) => ({
   setSelectedReport: (report) => set({ selectedReport: report }),
   setIsLoading: (loading) => set({ isLoading: loading }),
   setStatusFilter: (filter) => set({ statusFilter: filter }),
+  setActiveCleanup: (report) => set({ activeCleanup: report }),
+  setCleanupStartedAt: (ts) => set({ cleanupStartedAt: ts }),
+  updateReportStatus: (id, status) =>
+    set((state) => ({
+      reports: state.reports.map((r) => (r.id === id ? { ...r, status } : r)),
+    })),
 }));

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useMapStore } from "@/store/mapStore";
 import { useGuestId } from "@/hooks/useGuestId";
 import { useGeolocation } from "@/hooks/useGeolocation";
@@ -12,6 +12,9 @@ import SplashScreen from "@/components/ui/SplashScreen";
 import TopBar from "@/components/ui/TopBar";
 import FilterChips from "@/components/ui/FilterChips";
 import BottomNav from "@/components/ui/BottomNav";
+import ActiveCleanupBanner from "@/components/ui/ActiveCleanupBanner";
+import CompleteCleanupSheet from "@/components/ui/CompleteCleanupSheet";
+import { apiClient } from "@/lib/apiClient";
 import type { Report } from "@/types/report";
 import mapStyleJson from "@/public/map_style.json";
 
@@ -22,7 +25,19 @@ export default function Home() {
   useReports();
   useZoneStats();
 
-  const { isLoading, selectedReport, setSelectedReport } = useMapStore();
+  const {
+    isLoading,
+    selectedReport,
+    setSelectedReport,
+    guestId,
+    activeCleanup,
+    cleanupStartedAt,
+    setActiveCleanup,
+    setCleanupStartedAt,
+    updateReportStatus,
+  } = useMapStore();
+
+  const [showCompleteSheet, setShowCompleteSheet] = useState(false);
 
   const handleReportClick = useCallback(
     (report: Report) => setSelectedReport(report),
@@ -35,13 +50,44 @@ export default function Home() {
   );
 
   const handleStartCleanup = useCallback(
-    (report: Report) => {
+    async (report: Report) => {
       setSelectedReport(null);
-      // TODO: call API to transition status to inProgress
-      console.log("줍기 시작:", report.id);
+      try {
+        await apiClient.patch(
+          `/reports/${report.id}/status`,
+          { status: "inProgress" },
+          guestId ?? undefined
+        );
+      } catch {
+        // Proceed optimistically even if API fails
+      }
+      updateReportStatus(report.id, "inProgress");
+      setActiveCleanup(report);
+      setCleanupStartedAt(Date.now());
     },
-    [setSelectedReport]
+    [setSelectedReport, guestId, updateReportStatus, setActiveCleanup, setCleanupStartedAt]
   );
+
+  const handleCompleteCleanup = useCallback(async () => {
+    if (!activeCleanup) return;
+    try {
+      await apiClient.patch(
+        `/reports/${activeCleanup.id}/status`,
+        { status: "completed" },
+        guestId ?? undefined
+      );
+    } catch {
+      // Proceed optimistically even if API fails
+    }
+    updateReportStatus(activeCleanup.id, "completed");
+    setActiveCleanup(null);
+    setCleanupStartedAt(null);
+  }, [activeCleanup, guestId, updateReportStatus, setActiveCleanup, setCleanupStartedAt]);
+
+  const handleCompleteConfirm = useCallback(async () => {
+    setShowCompleteSheet(false);
+    await handleCompleteCleanup();
+  }, [handleCompleteCleanup]);
 
   if (isLoading) {
     return <SplashScreen />;
@@ -60,6 +106,22 @@ export default function Home() {
       </div>
 
       <BottomNav />
+
+      {activeCleanup && cleanupStartedAt !== null && (
+        <ActiveCleanupBanner
+          report={activeCleanup}
+          startedAt={cleanupStartedAt}
+          onComplete={() => setShowCompleteSheet(true)}
+        />
+      )}
+
+      {showCompleteSheet && cleanupStartedAt !== null && (
+        <CompleteCleanupSheet
+          elapsedMs={Date.now() - cleanupStartedAt}
+          onConfirm={handleCompleteConfirm}
+          onClose={() => setShowCompleteSheet(false)}
+        />
+      )}
 
       <ReportSheet
         report={selectedReport}

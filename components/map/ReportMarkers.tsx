@@ -1,7 +1,7 @@
 "use client";
 
 import { Marker } from "@react-google-maps/api";
-import { getMarkerIcon, getDotIcon } from "./MarkerPin";
+import { getMarkerIcon, getDotIcon, getActiveMarkerIcon, getActiveDotIcon } from "./MarkerPin";
 import { useMapStore } from "@/store/mapStore";
 import type { Report } from "@/types/report";
 
@@ -15,22 +15,37 @@ interface ReportMarkersProps {
 }
 
 export default function ReportMarkers({ reports, zoom, onMarkerClick }: ReportMarkersProps) {
-  const { statusFilter } = useMapStore();
+  const { statusFilter, activeCleanup } = useMapStore();
   const useIcons = zoom >= ICON_ZOOM_THRESHOLD;
 
-  const visible =
-    statusFilter === "all" ? reports : reports.filter((r) => r.status === statusFilter);
+  const visible = activeCleanup
+    ? reports.filter((r) => r.id === activeCleanup.id)
+    : statusFilter === "all"
+    ? reports
+    : reports.filter((r) => r.status === statusFilter);
 
   return (
     <>
-      {visible.map((report) => (
-        <Marker
-          key={report.id}
-          position={{ lat: report.latitude, lng: report.longitude }}
-          icon={useIcons ? getMarkerIcon(report.status) : getDotIcon(report.status)}
-          onClick={() => onMarkerClick(report)}
-        />
-      ))}
+      {visible.map((report) => {
+        const isActive = activeCleanup?.id === report.id;
+        return (
+          <Marker
+            key={report.id}
+            position={{ lat: report.latitude, lng: report.longitude }}
+            icon={
+              isActive
+                ? useIcons
+                  ? getActiveMarkerIcon()
+                  : getActiveDotIcon()
+                : useIcons
+                ? getMarkerIcon(report.status)
+                : getDotIcon(report.status)
+            }
+            zIndex={isActive ? 10 : 1}
+            onClick={() => onMarkerClick(report)}
+          />
+        );
+      })}
     </>
   );
 }

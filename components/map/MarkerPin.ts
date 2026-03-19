@@ -69,6 +69,37 @@ function buildDot(color: string): string {
   </svg>`;
 }
 
+function buildActiveDot(): string {
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28">
+    <circle cx="14" cy="14" r="13" fill="#f97316" opacity="0.25"/>
+    <circle cx="14" cy="14" r="8" fill="#f97316" stroke="white" stroke-width="2.5"/>
+  </svg>`;
+}
+
+function buildActivePickerIcon(): string {
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="56" viewBox="0 0 48 56">
+    <!-- Outer pulse ring -->
+    <circle cx="24" cy="10" r="14" fill="#fed7aa" opacity="0.5"/>
+    <!-- Head -->
+    <circle cx="26" cy="8" r="6" fill="#ea580c"/>
+    <!-- Torso -->
+    <line x1="26" y1="14" x2="22" y2="28" stroke="#ea580c" stroke-width="3.5" stroke-linecap="round"/>
+    <!-- Left arm (holding stick) -->
+    <line x1="26" y1="19" x2="12" y2="26" stroke="#ea580c" stroke-width="3" stroke-linecap="round"/>
+    <!-- Right arm -->
+    <line x1="26" y1="19" x2="33" y2="24" stroke="#ea580c" stroke-width="3" stroke-linecap="round"/>
+    <!-- Left leg -->
+    <line x1="22" y1="28" x2="17" y2="42" stroke="#ea580c" stroke-width="3" stroke-linecap="round"/>
+    <!-- Right leg (bent, picking up) -->
+    <line x1="22" y1="28" x2="31" y2="36" stroke="#ea580c" stroke-width="3" stroke-linecap="round"/>
+    <line x1="31" y1="36" x2="26" y2="46" stroke="#ea580c" stroke-width="3" stroke-linecap="round"/>
+    <!-- Picker stick -->
+    <line x1="12" y1="26" x2="7" y2="46" stroke="#78716c" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Trash at bottom of stick -->
+    <circle cx="7" cy="47" r="4" fill="#78716c"/>
+  </svg>`;
+}
+
 // ── Public API ────────────────────────────────────────────────────────────────
 
 const ICON_BUILDERS: Record<ReportStatus, () => string> = {
@@ -92,5 +123,23 @@ export function getDotIcon(status: ReportStatus): MarkerIcon {
     url: `data:image/svg+xml,${encodeURIComponent(svg)}`,
     anchor: new google.maps.Point(8, 8),
     scaledSize: new google.maps.Size(16, 16),
+  };
+}
+
+export function getActiveMarkerIcon(): MarkerIcon {
+  const svg = buildActivePickerIcon();
+  return {
+    url: `data:image/svg+xml,${encodeURIComponent(svg)}`,
+    anchor: new google.maps.Point(24, 56),
+    scaledSize: new google.maps.Size(48, 56),
+  };
+}
+
+export function getActiveDotIcon(): MarkerIcon {
+  const svg = buildActiveDot();
+  return {
+    url: `data:image/svg+xml,${encodeURIComponent(svg)}`,
+    anchor: new google.maps.Point(14, 14),
+    scaledSize: new google.maps.Size(28, 28),
   };
 }
