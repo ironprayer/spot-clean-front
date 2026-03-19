@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 type NavTab = "map" | "list" | "stats" | "my";
 
@@ -53,11 +54,8 @@ const NAV_ITEMS: NavItem[] = [
   { key: "my", label: "마이", icon: <PersonIcon /> },
 ];
 
-interface BottomNavProps {
-  onReport?: () => void;
-}
-
-export default function BottomNav({ onReport }: BottomNavProps) {
+export default function BottomNav() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<NavTab>("map");
 
   return (
@@ -92,7 +90,7 @@ export default function BottomNav({ onReport }: BottomNavProps) {
       {/* Center FAB — protrudes above nav */}
       <div className="absolute left-1/2 -translate-x-1/2 -top-6">
         <button
-          onClick={onReport}
+          onClick={() => router.push("/report")}
           className="w-14 h-14 bg-green-500 hover:bg-green-600 active:bg-green-700 rounded-full shadow-xl flex items-center justify-center ring-4 ring-white transition-colors"
           aria-label="쓰레기 신고하기"
         >

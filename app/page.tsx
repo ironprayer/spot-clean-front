@@ -64,7 +64,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Bottom navigation */}
       <BottomNav />
 
       <ReportSheet
