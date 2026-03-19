@@ -3,9 +3,7 @@
 import { useCallback, useState } from "react";
 import { GoogleMap } from "@react-google-maps/api";
 import { useMapStore } from "@/store/mapStore";
-import HeatmapOverlay from "./HeatmapOverlay";
 import ReportMarkers from "./ReportMarkers";
-import OpacitySlider from "./OpacitySlider";
 import type { Report } from "@/types/report";
 
 const MAP_CONTAINER_STYLE = { width: "100%", height: "100%" };
@@ -17,16 +15,14 @@ interface MapViewProps {
 
 export default function MapView({ mapStyle, onReportClick }: MapViewProps) {
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
-  const {
-    currentPosition,
-    overlayOpacity,
-    setOverlayOpacity,
-    zones,
-    reports,
-  } = useMapStore();
+  const [zoom, setZoom] = useState(15);
+  const { currentPosition, reports } = useMapStore();
 
   const onLoad = useCallback((map: google.maps.Map) => {
     setMapInstance(map);
+    map.addListener("zoom_changed", () => {
+      setZoom(map.getZoom() ?? 15);
+    });
   }, []);
 
   const onUnmount = useCallback(() => {
@@ -57,15 +53,8 @@ export default function MapView({ mapStyle, onReportClick }: MapViewProps) {
           mapTypeControl: false,
         }}
       >
-        <ReportMarkers reports={reports} onMarkerClick={onReportClick} />
+        <ReportMarkers reports={reports} zoom={zoom} onMarkerClick={onReportClick} />
       </GoogleMap>
-
-      <HeatmapOverlay map={mapInstance} zones={zones} opacity={overlayOpacity} />
-
-      {/* Opacity slider — bottom-left */}
-      <div className="absolute left-4 bottom-28">
-        <OpacitySlider value={overlayOpacity} onChange={setOverlayOpacity} />
-      </div>
 
       {/* Locate me button — bottom-right FAB */}
       <button
