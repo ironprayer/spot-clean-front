@@ -7,6 +7,7 @@ export type StatusFilter = "all" | ReportStatus;
 interface MapState {
   guestId: string | null;
   currentPosition: { lat: number; lng: number };
+  locationError: string | null;
   overlayOpacity: number;
   zones: ZoneStat[];
   reports: Report[];
@@ -16,6 +17,7 @@ interface MapState {
 
   setGuestId: (id: string) => void;
   setCurrentPosition: (pos: { lat: number; lng: number }) => void;
+  setLocationError: (error: string | null) => void;
   setOverlayOpacity: (opacity: number) => void;
   setZones: (zones: ZoneStat[]) => void;
   setReports: (reports: Report[]) => void;
@@ -27,6 +29,7 @@ interface MapState {
 export const useMapStore = create<MapState>((set) => ({
   guestId: null,
   currentPosition: { lat: 37.5665, lng: 126.978 }, // Seoul fallback
+  locationError: null,
   overlayOpacity: 0.4,
   zones: [],
   reports: [],
@@ -36,6 +39,7 @@ export const useMapStore = create<MapState>((set) => ({
 
   setGuestId: (id) => set({ guestId: id }),
   setCurrentPosition: (pos) => set({ currentPosition: pos }),
+  setLocationError: (error) => set({ locationError: error }),
   setOverlayOpacity: (opacity) => set({ overlayOpacity: opacity }),
   setZones: (zones) => set({ zones }),
   setReports: (reports) => set({ reports }),
