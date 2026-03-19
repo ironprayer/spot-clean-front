@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { useMapStore } from "@/store/mapStore";
 import { useGuestId } from "@/hooks/useGuestId";
 import { useGeolocation } from "@/hooks/useGeolocation";
@@ -13,7 +14,6 @@ import TopBar from "@/components/ui/TopBar";
 import FilterChips from "@/components/ui/FilterChips";
 import BottomNav from "@/components/ui/BottomNav";
 import ActiveCleanupBanner from "@/components/ui/ActiveCleanupBanner";
-import CompleteCleanupSheet from "@/components/ui/CompleteCleanupSheet";
 import { apiClient } from "@/lib/apiClient";
 import type { Report } from "@/types/report";
 import mapStyleJson from "@/public/map_style.json";
@@ -25,6 +25,7 @@ export default function Home() {
   useReports();
   useZoneStats();
 
+  const router = useRouter();
   const {
     isLoading,
     selectedReport,
@@ -36,8 +37,6 @@ export default function Home() {
     setCleanupStartedAt,
     updateReportStatus,
   } = useMapStore();
-
-  const [showCompleteSheet, setShowCompleteSheet] = useState(false);
 
   const handleReportClick = useCallback(
     (report: Report) => setSelectedReport(report),
@@ -68,27 +67,6 @@ export default function Home() {
     [setSelectedReport, guestId, updateReportStatus, setActiveCleanup, setCleanupStartedAt]
   );
 
-  const handleCompleteCleanup = useCallback(async () => {
-    if (!activeCleanup) return;
-    try {
-      await apiClient.patch(
-        `/reports/${activeCleanup.id}/status`,
-        { status: "completed" },
-        guestId ?? undefined
-      );
-    } catch {
-      // Proceed optimistically even if API fails
-    }
-    updateReportStatus(activeCleanup.id, "completed");
-    setActiveCleanup(null);
-    setCleanupStartedAt(null);
-  }, [activeCleanup, guestId, updateReportStatus, setActiveCleanup, setCleanupStartedAt]);
-
-  const handleCompleteConfirm = useCallback(async () => {
-    setShowCompleteSheet(false);
-    await handleCompleteCleanup();
-  }, [handleCompleteCleanup]);
-
   if (isLoading) {
     return <SplashScreen />;
   }
@@ -111,15 +89,7 @@ export default function Home() {
         <ActiveCleanupBanner
           report={activeCleanup}
           startedAt={cleanupStartedAt}
-          onComplete={() => setShowCompleteSheet(true)}
-        />
-      )}
-
-      {showCompleteSheet && cleanupStartedAt !== null && (
-        <CompleteCleanupSheet
-          elapsedMs={Date.now() - cleanupStartedAt}
-          onConfirm={handleCompleteConfirm}
-          onClose={() => setShowCompleteSheet(false)}
+          onComplete={() => router.push("/cleanup/complete")}
         />
       )}
 
