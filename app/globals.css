@@ -15,7 +15,19 @@ main {
   height: 100%;
 }
 
-/* Safe area bottom for iOS */
+/* Safe area */
 .pb-safe {
   padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* Horizontal scroll without scrollbar */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }

@@ -10,6 +10,9 @@ import { useZoneStats } from "@/hooks/useZoneStats";
 import MapView from "@/components/map/MapView";
 import ReportSheet from "@/components/report/ReportSheet";
 import SplashScreen from "@/components/ui/SplashScreen";
+import TopBar from "@/components/ui/TopBar";
+import FilterChips from "@/components/ui/FilterChips";
+import BottomNav from "@/components/ui/BottomNav";
 import type { Report } from "@/types/report";
 import mapStyleJson from "@/public/map_style.json";
 
@@ -52,6 +55,17 @@ export default function Home() {
       <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY} loadingElement={<SplashScreen />}>
         <MapView mapStyle={mapStyleJson as google.maps.MapTypeStyle[]} onReportClick={handleReportClick} />
       </LoadScript>
+
+      {/* Top overlay: TopBar + FilterChips */}
+      <div className="fixed top-0 left-0 right-0 z-30 pt-safe pointer-events-none">
+        <div className="px-4 pt-3 flex flex-col gap-2">
+          <TopBar />
+          <FilterChips />
+        </div>
+      </div>
+
+      {/* Bottom navigation */}
+      <BottomNav />
 
       <ReportSheet
         report={selectedReport}

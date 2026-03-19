@@ -1,6 +1,8 @@
 import { create } from "zustand";
-import type { Report } from "@/types/report";
+import type { Report, ReportStatus } from "@/types/report";
 import type { ZoneStat } from "@/types/zoneStat";
+
+export type StatusFilter = "all" | ReportStatus;
 
 interface MapState {
   guestId: string | null;
@@ -10,6 +12,7 @@ interface MapState {
   reports: Report[];
   selectedReport: Report | null;
   isLoading: boolean;
+  statusFilter: StatusFilter;
 
   setGuestId: (id: string) => void;
   setCurrentPosition: (pos: { lat: number; lng: number }) => void;
@@ -18,6 +21,7 @@ interface MapState {
   setReports: (reports: Report[]) => void;
   setSelectedReport: (report: Report | null) => void;
   setIsLoading: (loading: boolean) => void;
+  setStatusFilter: (filter: StatusFilter) => void;
 }
 
 export const useMapStore = create<MapState>((set) => ({
@@ -28,6 +32,7 @@ export const useMapStore = create<MapState>((set) => ({
   reports: [],
   selectedReport: null,
   isLoading: true,
+  statusFilter: "all",
 
   setGuestId: (id) => set({ guestId: id }),
   setCurrentPosition: (pos) => set({ currentPosition: pos }),
@@ -36,4 +41,5 @@ export const useMapStore = create<MapState>((set) => ({
   setReports: (reports) => set({ reports }),
   setSelectedReport: (report) => set({ selectedReport: report }),
   setIsLoading: (loading) => set({ isLoading: loading }),
+  setStatusFilter: (filter) => set({ statusFilter: filter }),
 }));

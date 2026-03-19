@@ -57,7 +57,7 @@ export default function ReportSheet({ report, onClose, onStartCleanup }: ReportS
       {/* Sheet */}
       <div
         ref={sheetRef}
-        className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-2xl shadow-xl p-4 pb-safe"
+        className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-2xl shadow-xl p-4"
         role="dialog"
         aria-modal="true"
       >

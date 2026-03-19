@@ -56,10 +56,10 @@ export default function MapView({ mapStyle, onReportClick }: MapViewProps) {
         <ReportMarkers reports={reports} zoom={zoom} onMarkerClick={onReportClick} />
       </GoogleMap>
 
-      {/* Locate me button — bottom-right FAB */}
+      {/* Locate me button — above bottom nav */}
       <button
         onClick={handleLocateMe}
-        className="absolute right-4 bottom-28 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 active:bg-gray-100 transition-colors"
+        className="absolute right-4 bottom-24 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 active:bg-gray-100 transition-colors"
         aria-label="현재 위치로 이동"
       >
         <svg
