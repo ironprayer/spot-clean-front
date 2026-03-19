@@ -1,0 +1,14 @@
+"use client";
+
+import { LoadScript } from "@react-google-maps/api";
+import SplashScreen from "@/components/ui/SplashScreen";
+
+const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
+
+export default function GoogleMapsProvider({ children }: { children: React.ReactNode }) {
+  return (
+    <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY} loadingElement={<SplashScreen />}>
+      {children}
+    </LoadScript>
+  );
+}

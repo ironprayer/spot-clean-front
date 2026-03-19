@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import GoogleMapsProvider from "@/components/providers/GoogleMapsProvider";
 
 export const metadata: Metadata = {
   title: "Spot Clean",
@@ -13,7 +14,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body className="h-screen overflow-hidden">{children}</body>
+      <body className="h-screen overflow-hidden">
+        <GoogleMapsProvider>{children}</GoogleMapsProvider>
+      </body>
     </html>
   );
 }

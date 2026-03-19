@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import exifr from "exifr";
 import { useMapStore } from "@/store/mapStore";
 import { distanceKm } from "@/lib/geo";
+import MiniMap from "@/components/report/MiniMap";
 
 const MAX_PHOTOS = 5;
 const MAX_RADIUS_KM = 0.3; // 300m
@@ -83,6 +84,19 @@ export default function ReportPage() {
 
   const validPhotos = photos.filter((p) => !p.error);
   const hasInvalid = photos.some((p) => p.error);
+
+  const photoMapPoints = useMemo(
+    () =>
+      photos
+        .filter((p) => p.gps !== null)
+        .map((p) => ({
+          preview: p.preview,
+          lat: p.gps!.lat,
+          lng: p.gps!.lng,
+          hasError: p.error !== null,
+        })),
+    [photos]
+  );
   const canSubmit =
     validPhotos.length > 0 && description.trim().length > 0 && !submitting;
 
@@ -294,21 +308,36 @@ export default function ReportPage() {
             <p className="text-xs text-gray-400 mt-1 text-right">{description.length}자</p>
           </section>
 
-          {/* ── Current location ── */}
-          <section className="bg-white rounded-2xl p-4 shadow-sm">
-            <h2 className="text-sm font-semibold text-gray-800 mb-2">신고 위치</h2>
-            <div className="flex items-center gap-3 bg-gray-50 rounded-xl px-3 py-3">
-              <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center shrink-0">
-                <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                </svg>
+          {/* ── Mini map preview ── */}
+          <section className="bg-white rounded-2xl overflow-hidden shadow-sm">
+            <div className="px-4 pt-4 pb-3 flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-gray-800">위치 미리보기</h2>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-green-500" />
+                <span className="text-xs text-gray-500">내 위치</span>
+                {photoMapPoints.length > 0 && (
+                  <>
+                    <span className="w-2 h-2 rounded-full bg-white border border-gray-300 ml-1" />
+                    <span className="text-xs text-gray-500">사진 위치</span>
+                  </>
+                )}
               </div>
-              <div>
-                <p className="text-xs text-gray-500">현재 위치 (자동 감지)</p>
-                <p className="text-xs font-mono text-gray-700 mt-0.5">
-                  {currentPosition.lat.toFixed(6)}, {currentPosition.lng.toFixed(6)}
-                </p>
-              </div>
+            </div>
+
+            {/* Map */}
+            <div className="h-52 w-full">
+              <MiniMap currentPosition={currentPosition} photos={photoMapPoints} />
+            </div>
+
+            {/* Coords */}
+            <div className="px-4 py-3 border-t border-gray-50 flex items-center gap-2">
+              <svg className="w-3.5 h-3.5 text-green-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+              </svg>
+              <p className="text-xs font-mono text-gray-500">
+                {currentPosition.lat.toFixed(6)}, {currentPosition.lng.toFixed(6)}
+              </p>
+              <span className="ml-auto text-[10px] text-gray-400">반경 300m</span>
             </div>
           </section>
         </div>

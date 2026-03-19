@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback } from "react";
-import { LoadScript } from "@react-google-maps/api";
 import { useMapStore } from "@/store/mapStore";
 import { useGuestId } from "@/hooks/useGuestId";
 import { useGeolocation } from "@/hooks/useGeolocation";
@@ -15,8 +14,6 @@ import FilterChips from "@/components/ui/FilterChips";
 import BottomNav from "@/components/ui/BottomNav";
 import type { Report } from "@/types/report";
 import mapStyleJson from "@/public/map_style.json";
-
-const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
 
 export default function Home() {
   // Initialize all data sources
@@ -52,9 +49,7 @@ export default function Home() {
 
   return (
     <main className="h-screen w-screen relative">
-      <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY} loadingElement={<SplashScreen />}>
-        <MapView mapStyle={mapStyleJson as google.maps.MapTypeStyle[]} onReportClick={handleReportClick} />
-      </LoadScript>
+      <MapView mapStyle={mapStyleJson as google.maps.MapTypeStyle[]} onReportClick={handleReportClick} />
 
       {/* Top overlay: TopBar + FilterChips */}
       <div className="fixed top-0 left-0 right-0 z-30 pt-safe pointer-events-none">
