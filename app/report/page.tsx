@@ -7,7 +7,7 @@ import { useMapStore } from "@/store/mapStore";
 import { distanceKm } from "@/lib/geo";
 
 const MAX_PHOTOS = 5;
-const MAX_RADIUS_KM = 5;
+const MAX_RADIUS_KM = 0.3; // 300m
 
 interface PhotoItem {
   file: File;
@@ -61,7 +61,7 @@ export default function ReportPage() {
               preview,
               gps: { lat, lng },
               distKm: dist,
-              error: `현재 위치에서 ${dist.toFixed(1)}km 떨어진 사진입니다. (5km 초과)`,
+              error: `현재 위치에서 ${(dist * 1000).toFixed(0)}m 떨어진 사진입니다. (300m 초과)`,
             };
           }
 
@@ -197,7 +197,7 @@ export default function ReportPage() {
             />
 
             <p className="text-xs text-gray-400 mt-3">
-              사진의 GPS 정보를 읽어 현재 위치 반경 5km 이내의 사진만 업로드됩니다.
+              사진의 GPS 정보를 읽어 현재 위치 반경 300m 이내의 사진만 업로드됩니다.
             </p>
           </section>
 
@@ -318,7 +318,7 @@ export default function ReportPage() {
       <div className="bg-white border-t border-gray-100 px-4 py-4 pb-safe shrink-0">
         {validPhotos.length === 0 && photos.length > 0 && (
           <p className="text-xs text-center text-red-500 mb-3">
-            유효한 사진이 없습니다. 5km 이내에서 찍은 사진을 추가해 주세요.
+            유효한 사진이 없습니다. 300m 이내에서 찍은 사진을 추가해 주세요.
           </p>
         )}
         <button
