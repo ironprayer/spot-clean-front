@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 type NavTab = "map" | "list" | "stats" | "my";
 
 interface NavItem {
   key: NavTab;
   label: string;
+  href?: string;
   icon: React.ReactNode;
 }
 
@@ -48,15 +48,22 @@ function PersonIcon() {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { key: "map", label: "지도", icon: <MapIcon /> },
-  { key: "list", label: "목록", icon: <ListIcon /> },
-  { key: "stats", label: "통계", icon: <StatsIcon /> },
-  { key: "my", label: "마이", icon: <PersonIcon /> },
+  { key: "map",   label: "지도", href: "/",    icon: <MapIcon /> },
+  { key: "list",  label: "목록",               icon: <ListIcon /> },
+  { key: "stats", label: "통계",               icon: <StatsIcon /> },
+  { key: "my",    label: "마이", href: "/my",  icon: <PersonIcon /> },
 ];
+
+function pathnameToTab(pathname: string): NavTab {
+  if (pathname === "/my") return "my";
+  if (pathname === "/") return "map";
+  return "map";
+}
 
 export default function BottomNav() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<NavTab>("map");
+  const pathname = usePathname();
+  const activeTab = pathnameToTab(pathname);
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-30 bg-white/90 backdrop-blur-xl border-t border-gray-100 shadow-2xl">
@@ -67,7 +74,7 @@ export default function BottomNav() {
             key={item.key}
             item={item}
             active={activeTab === item.key}
-            onPress={() => setActiveTab(item.key)}
+            onPress={() => item.href && router.push(item.href)}
           />
         ))}
 
@@ -82,7 +89,7 @@ export default function BottomNav() {
             key={item.key}
             item={item}
             active={activeTab === item.key}
-            onPress={() => setActiveTab(item.key)}
+            onPress={() => item.href && router.push(item.href)}
           />
         ))}
       </div>
